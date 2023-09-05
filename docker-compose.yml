@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+
+  nginx:
+    image: $NGINX_TAG
+    container_name: "${PROJECT_NAME}_nginx"
+    volumes:
+     - ./:/var/www/html/
+     - ./_docker/conf.d:/etc/nginx/conf.d/
+    ports:
+     - "80:80"
+
+  php:
+    build:
+      context: .
+      dockerfile: _docker/app/Dockerfile
+    volumes:
+     - ./:/var/www/html/
+    container_name: "${PROJECT_NAME}_php"
+    environment:
+         PHP_XDEBUG: 1
+         PHP_XDEBUG_MODE: profile,coverage,debug
+         PHP_IDE_CONFIG: serverName=my-ide
+         PHP_XDEBUG_IDEKEY: "my-ide"
+         PHP_XDEBUG_START_WITH_REQUEST: trigger
+         PHP_XDEBUG_TRIGGER_VALUE: "my-ide"
+         PHP_XDEBUG_CLIENT_HOST: 172.17.0.1 # Linux
+         PHP_XDEBUG_PROFILER_OUTPUT_NAME: "%t"
+         PHP_XDEBUG_LOG_LEVEL: 0
